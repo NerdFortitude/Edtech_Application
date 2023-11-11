@@ -224,10 +224,11 @@ exports.login = async (req, res) => {
         //if matches then generate the jwt token
 
         const payload = {
-            email: email,
-            accountType: userInDB.accountType,
-
+            id: userInDB._id,
+            email: userInDB.email,
+            role: userInDB.accountType,
         }
+
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: '2hr',
         });
@@ -247,6 +248,7 @@ exports.login = async (req, res) => {
             })
             .status(200).json({
                 userInDB,
+                token,
                 success: true,
                 message: "User successfully logged in",
             })
@@ -266,3 +268,44 @@ exports.login = async (req, res) => {
 }
 
 
+// change the password
+
+exports.changePassword = async (req, res) => {
+
+
+    try {
+
+        //fetch data
+        const { oldPassword, newPassword, confirmPassword, email } = req.body;
+        //get oldPassword, newPassword, confirmNewPassword, email
+
+        //validation(checing if the fields are empty)
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            return res.status(409).json({
+                success: false,
+                message: "All fields are required"
+            })
+        }
+
+
+
+        //getting the  user by the email
+        const user = await User.findOne({ email: email });
+
+
+
+
+        //update the password in DB
+
+        //send mail - Password updated
+
+        //return response
+
+    } catch (error) {
+
+    }
+
+
+
+}
