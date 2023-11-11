@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 require("dotenv").config();
 
 
-const mailSender  = async (email,subject,otp) => {
+const mailSender  = async (email,subject,body) => {
 
     try{
         const transporter = nodemailer.createTransport({
@@ -17,7 +17,7 @@ const mailSender  = async (email,subject,otp) => {
             from:'Nishant',
             to:`${email}`,
             subject:`${subject}`,
-            html:`<h2>This is the verification email</h2> <p>${otp}</p>`
+            html:`<p>${body}</p>`
         });
 
         //only for testing the below two lines
