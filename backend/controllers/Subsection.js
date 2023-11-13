@@ -68,6 +68,61 @@ exports.createSubSection = async (req, res) => {
 
 // updateSubSection
 
+exports.updateSubSection = async (req,res) => {
+    try{
+
+        const toUpdate = {}
+        //fetch data
+        const {subSectionId, title, timeDuration, description } = req.body
+
+       //fetch video from req.files.videoFile;
+
+       const video = req.files.videoFile;
+
+
+       //validate the data and add them  to toUpdate
+
+       const subSectionToUpdate = await SubSection.findById(subSectionId);
+
+       if(!subSectionId){
+        return res.status(404).json({
+            success:false,
+            message:"The sub section not found"
+        });
+       }
+
+
+       if(title){
+        toUpdate.title = title;
+       }
+
+       if(timeDuration){
+        toUpdate.timeDuration = timeDuration;
+       }
+
+       if(description){
+        toUpdate.description = description;
+       }
+
+       if(video){
+        const previousVideoId = subSectionToUpdate.videoUrl.split("/")[str.split("/").length-1].split('.')[0];
+        
+        //    then upload the video to cloudinary and then add te secure url to the 
+        //    subSection 
+       }
+
+        
+
+    } catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while updating a subSection"
+        });
+    }
+}
+
+
+
 
 
 // deleteSubSection
