@@ -314,7 +314,7 @@ exports.changePassword = async (req, res) => {
         const hashedPassword = await bcrypt.hash(newPassword,10);
 
 
-        //create an entry in the database 
+        //create an entry in the database t
         const newUserDetails = await User.findByIdAndUpdate(userId, {password:hashedPassword});
 
 
