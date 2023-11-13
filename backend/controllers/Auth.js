@@ -203,7 +203,7 @@ exports.login = async (req, res) => {
 
         //check if the user exists 
 
-        let userInDB = await User.findOne({ email });
+        let userInDB = await User.findOne({ email }).populate('additionalDetails').exec();
 
         if (!userInDB) {
             return res.status(403).json({
@@ -268,7 +268,7 @@ exports.login = async (req, res) => {
 }
 
 
-// change the password
+// change the password (incomplete)
 
 exports.changePassword = async (req, res) => {
 
