@@ -4,6 +4,7 @@ const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
 const Profile = require("../models/Profile");
 const jwt = require("jsonwebtoken");
+const mailSender = require("../utils/mailSender");
 require("dotenv").config();
 
 
@@ -276,36 +277,73 @@ exports.changePassword = async (req, res) => {
     try {
 
         //fetch data
-        const { oldPassword, newPassword, confirmPassword, email } = req.body;
-        //get oldPassword, newPassword, confirmNewPassword, email
+        //get currentPassword and newPassword
+        const { currentPassword, newPassword} = req.body;
+        
 
-        //validation(checing if the fields are empty)
+        //get the user id
+        const userId = req.user.id;
 
-        if (!oldPassword || !newPassword || !confirmPassword) {
-            return res.status(409).json({
-                success: false,
-                message: "All fields are required"
+        //validations
+        if(!currentPassword || !newPassword || !userId){
+            return res.status(400).json({
+                success:false,
+                message:"All fields are required",
+            });
+        }
+
+        //get the userDetails in the DB
+        const userDetails = await User.findById(userId);
+
+        if(!userDetails){
+            return res.status(404).json({
+                success:false,
+                message:"The user does not exists",
+            })
+        }
+
+        if(! await bcrypt.compare(currentPassword,userDetails.password)){
+            return res.status(403).json({
+                success:false,
+                message:"Current password is incorrect",
             })
         }
 
 
-
-        //getting the  user by the email
-        const user = await User.findOne({ email: email });
-
+        //if the current password is correct then hash the newpassword
+        const hashedPassword = await bcrypt.hash(newPassword,10);
 
 
+        //create an entry in the database 
+        const newUserDetails = await User.findByIdAndUpdate(userId, {password:hashedPassword});
 
-        //update the password in DB
 
-        //send mail - Password updated
+        //send a mail to the user 
+        await mailSender(newUserDetails.email, "Password Updated", "Your password has been updated")
 
-        //return response
+
+
+
+       //return response
+       return res.status(200).json({
+        success:false,
+        message:"The password has been updated successfully"
+       });
+
+
+        //sice we are using the isAuth middleare we will get the req.user from there we can access
+        // the the userInDb and thus we can change the password
+
 
     } catch (error) {
+        console.log("Something went wrong while changing the password");
+        console.log(error.message);
 
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while changing the password",
+        })
+        
     }
-
-
 
 }
